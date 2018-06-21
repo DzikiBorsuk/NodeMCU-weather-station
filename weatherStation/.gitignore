@@ -260,3 +260,9 @@ paket-files/
 __pycache__/
 *.pyc
 
+weatherStation/Debug/*
+weatherStation/Release/*
+Debug/*
+Release/*
+weatherStation/__vm/*
+weatherStation/__vm/*.h
