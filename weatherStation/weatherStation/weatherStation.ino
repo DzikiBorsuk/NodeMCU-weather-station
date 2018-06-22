@@ -10,8 +10,8 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 
-const char* ssid = "esp12";
-const char* password = "12345esp";
+const char* ssid = "CPSWirelessNetwork";
+const char* password = "Wifi&49CPS";
 
 
 
@@ -68,6 +68,11 @@ void setup() {
 	Serial.println("Ready");
 	Serial.print("IP address: ");
 	Serial.println(WiFi.localIP());
+
+
+
+
+
 }
 
 
@@ -76,4 +81,6 @@ void setup() {
 void loop()
 {
 	ArduinoOTA.handle();
+
+
 }
