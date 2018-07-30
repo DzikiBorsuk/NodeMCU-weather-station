@@ -5,20 +5,73 @@
 */
 
 
+#include <PubSubClient.h>
+#include "DustSensor.h"
+//#include "bme680.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BME680.h"
 
-const char* ssid = "CPSWirelessNetwork";
-const char* password = "Wifi&49CPS";
+#define PIN_LED          D6
+#define temperature_topic "esp8266/temperature"
+Adafruit_BME680 bme;
 
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void wifiSetup();
 
 
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(115200);
+	//pinMode(PIN_LED, OUTPUT);
+	const char* mqtt_server = "cpsiot.cs.uni-kl.de";
+	wifiSetup();
+	client.setServer(mqtt_server, 1883);
+	while (true)
+	{
+		if (!client.connected()) {
+			MQTTReconnect();
+		}
+		client.loop();
+		temp();
+	}
+	//SensorPylu();
+
+
+
+}
+
+
+
+// the loop function runs over and over again until power down or reset
+void loop()
+{
+	/*int x;
+	
+	digitalWrite(PIN_LED, HIGH);
+	delay(50);
+	x = analogRead(A0);
+	delay(1);
+	digitalWrite(PIN_LED, LOW);
+	Serial.println(x);
+	delay(500);*/
+	
+	ArduinoOTA.handle();
+
+
+}
+
+void wifiSetup()
+{
+	const char* ssid = "CPSWirelessNetwork";
+	const char* password = "Wifi&49CPS";
 	Serial.println("Booting");
+	Serial.println("Connecting to WiFI");
 	WiFi.mode(WIFI_STA);
 	WiFi.begin(ssid, password);
 	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -68,19 +121,47 @@ void setup() {
 	Serial.println("Ready");
 	Serial.print("IP address: ");
 	Serial.println(WiFi.localIP());
-
-
-
-
-
 }
 
+void MQTTReconnect() {
+	// Loop until we're reconnected
+	while (!client.connected()) {
+		Serial.print("Attempting MQTT connection...");
+		// Attempt to connect
+		// If you do not want to use a username and password, change next line to
+		// if (client.connect("ESP8266Client")) {
+		if (client.connect("ESP8266Client")) {
+			Serial.println("connected");
+		}
+		else {
+			Serial.print("failed, rc=");
+			Serial.print(client.state());
+			Serial.println(" try again in 5 seconds");
+			// Wait 5 seconds before retrying
+			delay(5000);
+		}
+	}
+}
 
-
-// the loop function runs over and over again until power down or reset
-void loop()
+void temp()
 {
-	ArduinoOTA.handle();
+	char msg[50];
+	while (!Serial);
+	Serial.println(F("BME680 test"));
 
-
+	if (!bme.begin()) {
+		Serial.println("Could not find a valid BME680 sensor, check wiring!");
+		while (1);
+	}
+	bme.setTemperatureOversampling(BME680_OS_8X);
+	if (!bme.performReading()) {
+		Serial.println("Failed to perform reading :(");
+		return;
+	}
+	Serial.print("Temperature = ");
+	float temp = bme.temperature;
+	Serial.print(String(temp).c_str());
+	Serial.println(" *C");
+	snprintf(msg, 75, String(temp).c_str());
+	client.publish(temperature_topic,msg,true);
 }
