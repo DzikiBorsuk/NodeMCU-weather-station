@@ -11,6 +11,16 @@
 
 
 #endif
+#define SEALEVELPRESSURE_HPA (1013.25)
+#define temperature_topic "esp8266/temperature"
+#define humidity_topic "esp8266/humidity"
+#define gas_topic "esp8266/gas"
+#define pressure_topic "esp8266/pressure"
+#define altitude_topic "esp8266/altitude"
 
-void SensorBME680();
 void MQTTReconnect();
+void temperatureMeasure();
+void humidityMeasure();
+void gasMeasure();
+void pressureMeasure();
+void altitudeMeasure();

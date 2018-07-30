@@ -7,7 +7,7 @@
 
 #include <PubSubClient.h>
 #include "DustSensor.h"
-//#include "bme680.h"
+#include "bme680.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
@@ -16,12 +16,11 @@
 #include "Adafruit_BME680.h"
 
 #define PIN_LED          D6
-#define temperature_topic "esp8266/temperature"
+
 Adafruit_BME680 bme;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-
 void wifiSetup();
 
 
@@ -38,7 +37,7 @@ void setup() {
 			MQTTReconnect();
 		}
 		client.loop();
-		temp();
+		SensorBME680();
 	}
 	//SensorPylu();
 
@@ -143,9 +142,9 @@ void MQTTReconnect() {
 	}
 }
 
-void temp()
+
+void SensorBME680()
 {
-	char msg[50];
 	while (!Serial);
 	Serial.println(F("BME680 test"));
 
@@ -153,15 +152,20 @@ void temp()
 		Serial.println("Could not find a valid BME680 sensor, check wiring!");
 		while (1);
 	}
-	bme.setTemperatureOversampling(BME680_OS_8X);
-	if (!bme.performReading()) {
-		Serial.println("Failed to perform reading :(");
-		return;
-	}
-	Serial.print("Temperature = ");
-	float temp = bme.temperature;
-	Serial.print(String(temp).c_str());
-	Serial.println(" *C");
-	snprintf(msg, 75, String(temp).c_str());
-	client.publish(temperature_topic,msg,true);
+		//Set up oversampling and filter initialization
+		bme.setTemperatureOversampling(BME680_OS_8X);
+		bme.setHumidityOversampling(BME680_OS_2X);
+		bme.setPressureOversampling(BME680_OS_4X);
+		bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
+		bme.setGasHeater(320, 150); // 320*C for 150 ms
+		if (!bme.performReading()) {
+			Serial.println("Failed to perform reading :(");
+			return;
+		}
+		temperatureMeasure();
+		humidityMeasure();
+		Serial.println("Sprawdzenie w miedzyczasie");
+		gasMeasure();
+		pressureMeasure();
+		altitudeMeasure();
 }
