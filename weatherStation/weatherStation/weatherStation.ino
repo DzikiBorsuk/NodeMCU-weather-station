@@ -56,7 +56,10 @@ void wifiSetup()
 	const char* password = "Wifi&49CPS";
 	Serial.println("Booting");
 	Serial.println("Connecting to WiFI");
+	WiFi.forceSleepWake();
+	Serial.println("Przed podaniem hasla");
 	WiFi.begin(ssid, password);
+	Serial.println("Po podaniu hasla");
 	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
 		Serial.println("Connection Failed! Rebooting...");
 		delay(5000);
