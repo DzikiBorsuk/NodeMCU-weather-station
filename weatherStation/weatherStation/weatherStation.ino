@@ -10,14 +10,14 @@
 #include "bme680.h"
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
-#include <ArduinoOTA.h>
+#include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
 
 #define PIN_LED          D6
-
 Adafruit_BME680 bme;
-
+unsigned long endTime = 0;
+double toCalculateTenMins;
 WiFiClient espClient;
 PubSubClient client(espClient);
 void wifiSetup();
@@ -25,18 +25,26 @@ void wifiSetup();
 
 // the setup function runs once when you press reset or power the board
 void setup() {
+	
+	//beginTime = millis();
 	Serial.begin(115200);
 	//pinMode(PIN_LED, OUTPUT);
 	const char* mqtt_server = "cpsiot.cs.uni-kl.de";
 	wifiSetup();
 	client.setServer(mqtt_server, 1883);
-	
+
 		if (!client.connected()) {
 			MQTTReconnect();
 		}
 		client.loop();
 		SensorBME680();
-		ESP.deepSleep(5E6);
+		endTime = micros();
+		//passTime = beginTime - endTime;
+		//Serial.println(passTime);
+		toCalculateTenMins = static_cast<double>(endTime);
+		Serial.println(toCalculateTenMins);
+		ESP.deepSleep(30E6-toCalculateTenMins);
+
 	//SensorPylu();
 
 
@@ -48,6 +56,18 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop()
 {
+	/*int x;
+	
+	digitalWrite(PIN_LED, HIGH);
+	delay(50);
+	x = analogRead(A0);
+	delay(1);
+	digitalWrite(PIN_LED, LOW);
+	Serial.println(x);
+	delay(500);*/
+	
+
+
 }
 
 void wifiSetup()
@@ -58,6 +78,9 @@ void wifiSetup()
 	Serial.println("Connecting to WiFI");
 	WiFi.forceSleepWake();
 	Serial.println("Przed podaniem hasla");
+
+	
+//>>>>>>> parent of 0f4c11f... usuniecie paru niepotrzebnych linijek, dodanie DeepSleepu(ale nie dziala jezscze perfekcyjnie)
 	WiFi.begin(ssid, password);
 	Serial.println("Po podaniu hasla");
 	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -66,8 +89,8 @@ void wifiSetup()
 		ESP.restart();
 	}
 
-	Serial.print("IP address: ");
-	Serial.println(WiFi.localIP());
+
+	
 }
 
 void MQTTReconnect() {
@@ -110,7 +133,6 @@ void SensorBME680()
 			Serial.println("Failed to perform reading :(");
 			return;
 		}
-		
 		temperatureMeasure();
 		humidityMeasure();
 		Serial.println("Sprawdzenie w miedzyczasie");
