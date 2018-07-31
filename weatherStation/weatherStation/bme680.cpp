@@ -120,4 +120,5 @@ void altitudeMeasure()
 	Serial.println(" m");
 	snprintf(msg, 75, String(temp).c_str());
 	client.publish(altitude_topic, msg, true);
+	Serial.println("Opublikowalem wysokosc");
 }

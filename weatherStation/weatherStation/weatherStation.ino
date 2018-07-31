@@ -36,7 +36,7 @@ void setup() {
 		}
 		client.loop();
 		SensorBME680();
-		ESP.deepSleep(30E6);
+		ESP.deepSleep(5E6);
 	//SensorPylu();
 
 
