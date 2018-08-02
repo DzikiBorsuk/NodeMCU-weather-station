@@ -13,8 +13,10 @@
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
+#include <ArduinoJson.h>
 
 #define PIN_LED          D6
+#define sensor_topic "esp8266/weatherS"
 Adafruit_BME680 bme;
 unsigned long endTime = 0;
 double toCalculateTenMins;
@@ -32,19 +34,40 @@ void setup() {
 	const char* mqtt_server = "cpsiot.cs.uni-kl.de";
 	wifiSetup();
 	client.setServer(mqtt_server, 1883);
-
+	StaticJsonBuffer<200> jsonBuffer;
+	JsonObject& root = jsonBuffer.createObject();
 		if (!client.connected()) {
 			MQTTReconnect();
 		}
 		client.loop();
-		SensorBME680();
+		root["Sensor"] = "ESP8266";
+		SensorBME680(root);
+		Serial.println(root.measureLength() + 1);
+		//root.prettyPrintTo(Serial);
+		char JSONmessageBuffer[200];
+		root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+		Serial.println(JSONmessageBuffer);
+		
+		client.publish(sensor_topic, JSONmessageBuffer, true);
+		delay(10000);
+			/*Serial.println("udalo sie wyslac poprzez MQTT");
+		else
+			Serial.println("I couldnt send over MQTT");*/
 		endTime = micros();
-		//passTime = beginTime - endTime;
-		//Serial.println(passTime);
 		toCalculateTenMins = static_cast<double>(endTime);
-		Serial.println(toCalculateTenMins);
-		ESP.deepSleep(30E6-toCalculateTenMins);
-
+		//Serial.println(toCalculateTenMins);
+		//Serial.println("INFO:Closing MQTT connection");
+		//client.disconnect();
+		//Serial.println("Info:Closing WIFI connection");
+		//WiFi.disconnect();
+		//int i = 0;
+		//while (client.connected()||(WiFi.status()==WL_CONNECTED))
+		//{
+		//	Serial.println(i++);
+		//	delay(10);
+		//}
+		//ESP.deepSleep(60E6-toCalculateTenMins, WAKE_RF_DEFAULT);
+		ESP.deepSleep(5e6, WAKE_RF_DEFAULT);
 	//SensorPylu();
 
 
@@ -114,7 +137,7 @@ void MQTTReconnect() {
 }
 
 
-void SensorBME680()
+void SensorBME680(JsonObject& root)
 {
 	while (!Serial);
 	Serial.println(F("BME680 test"));
@@ -133,10 +156,27 @@ void SensorBME680()
 			Serial.println("Failed to perform reading :(");
 			return;
 		}
-		temperatureMeasure();
-		humidityMeasure();
+		//temperatureMeasure1(root);
+		temperatureMeasure(root);
+		pressureMeasure(root);
+		altitudeMeasure(root);
+		humidityMeasure(root);
 		Serial.println("Sprawdzenie w miedzyczasie");
-		gasMeasure();
-		pressureMeasure();
-		altitudeMeasure();
+		gasMeasure(root);
+		
+		
+		
+}
+void temperatureMeasure1(JsonObject& root)
+{
+	char msg[50];
+	float temp = bme.temperature;
+	Serial.print("Temperature = ");
+	Serial.print(String(temp).c_str());
+	Serial.println(" *C");
+	snprintf(msg, 75, String(temp).c_str());
+	
+	root["temperature"] = msg;
+	Serial.println(msg);
+	client.publish(temperature_topic, msg, true);
 }

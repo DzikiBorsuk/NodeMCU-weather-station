@@ -5,7 +5,7 @@
 #include "Adafruit_BME680.h"
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-
+#include <ArduinoJson.h>
 Adafruit_BME680 bme1; // I2C
 // 
 // 
@@ -70,8 +70,9 @@ void SensorBME680() {
 
 extern Adafruit_BME680 bme;
 extern PubSubClient client;
+extern JsonObject& root;
 
-void temperatureMeasure()
+void temperatureMeasure(JsonObject& root)
 {
 	char msg[50];
 	float temp = bme.temperature;
@@ -79,9 +80,10 @@ void temperatureMeasure()
 	Serial.print(String(temp).c_str());
 	Serial.println(" *C");
 	snprintf(msg, 75, String(temp).c_str());
+	root["temperature"] = msg;
 	client.publish(temperature_topic, msg, true);
 }
-void humidityMeasure()
+void humidityMeasure(JsonObject& root)
 {
 	char msg[50];
 	float temp = bme.humidity;
@@ -89,9 +91,10 @@ void humidityMeasure()
 	Serial.print(String(temp).c_str());
 	Serial.println(" %");
 	snprintf(msg, 75, String(temp).c_str());
+	root["humidity"] = msg;
 	client.publish(humidity_topic, msg, true);
 }
-void gasMeasure()
+void gasMeasure(JsonObject& root)
 {
 	char msg[50];
 	float temp = bme.gas_resistance/1000.0;
@@ -99,9 +102,10 @@ void gasMeasure()
 	Serial.print(String(temp).c_str());
 	Serial.println(" KOhms");
 	snprintf(msg, 75, String(temp).c_str());
+	root["gas"] = msg;
 	client.publish(gas_topic, msg, true);
 }
-void pressureMeasure()
+void pressureMeasure(JsonObject& root)
 {
 	char msg[50];
 	float temp = bme.pressure/100.0;
@@ -109,9 +113,10 @@ void pressureMeasure()
 	Serial.print(String(temp).c_str());
 	Serial.println(" hPa");
 	snprintf(msg, 75, String(temp).c_str());
+	root["pressure"] = msg;
 	client.publish(pressure_topic, msg, true);
 }
-void altitudeMeasure()
+void altitudeMeasure(JsonObject& root)
 {
 	char msg[50];
 	float temp = bme.readAltitude(SEALEVELPRESSURE_HPA);
@@ -119,6 +124,7 @@ void altitudeMeasure()
 	Serial.print(String(temp).c_str());
 	Serial.println(" m");
 	snprintf(msg, 75, String(temp).c_str());
+	//root["altitude"] = msg;
 	client.publish(altitude_topic, msg, true);
 	Serial.println("Opublikowalem wysokosc");
 }
