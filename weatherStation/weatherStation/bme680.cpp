@@ -81,7 +81,7 @@ void temperatureMeasure(JsonObject& root)
 	Serial.println(" *C");
 	snprintf(msg, 75, String(temp).c_str());
 	root["temperature"] = msg;
-	client.publish(temperature_topic, msg, true);
+	//client.publish(temperature_topic, msg, true);
 }
 void humidityMeasure(JsonObject& root)
 {
@@ -92,7 +92,7 @@ void humidityMeasure(JsonObject& root)
 	Serial.println(" %");
 	snprintf(msg, 75, String(temp).c_str());
 	root["humidity"] = msg;
-	client.publish(humidity_topic, msg, true);
+	//client.publish(humidity_topic, msg, true);
 }
 void gasMeasure(JsonObject& root)
 {
@@ -103,7 +103,7 @@ void gasMeasure(JsonObject& root)
 	Serial.println(" KOhms");
 	snprintf(msg, 75, String(temp).c_str());
 	root["gas"] = msg;
-	client.publish(gas_topic, msg, true);
+	//client.publish(gas_topic, msg, true);
 }
 void pressureMeasure(JsonObject& root)
 {
@@ -114,7 +114,7 @@ void pressureMeasure(JsonObject& root)
 	Serial.println(" hPa");
 	snprintf(msg, 75, String(temp).c_str());
 	root["pressure"] = msg;
-	client.publish(pressure_topic, msg, true);
+	//client.publish(pressure_topic, msg, true);
 }
 void altitudeMeasure(JsonObject& root)
 {
@@ -124,7 +124,7 @@ void altitudeMeasure(JsonObject& root)
 	Serial.print(String(temp).c_str());
 	Serial.println(" m");
 	snprintf(msg, 75, String(temp).c_str());
-	//root["altitude"] = msg;
+	root["altitude"] = msg;
 	client.publish(altitude_topic, msg, true);
-	Serial.println("Opublikowalem wysokosc");
+	//Serial.println("Opublikowalem wysokosc");
 }

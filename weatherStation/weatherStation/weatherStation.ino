@@ -15,8 +15,10 @@
 #include "Adafruit_BME680.h"
 #include <ArduinoJson.h>
 
+
 #define PIN_LED          D6
 #define sensor_topic "esp8266/weatherS"
+#define dust_topic "esp8266/dust"
 Adafruit_BME680 bme;
 unsigned long endTime = 0;
 double toCalculateTenMins;
@@ -42,14 +44,18 @@ void setup() {
 		client.loop();
 		root["Sensor"] = "ESP8266";
 		SensorBME680(root);
+		SensorPylu(root);
 		Serial.println(root.measureLength() + 1);
 		//root.prettyPrintTo(Serial);
 		char JSONmessageBuffer[200];
 		root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
 		Serial.println(JSONmessageBuffer);
 		
-		client.publish(sensor_topic, JSONmessageBuffer, true);
-		delay(10000);
+		while (!client.publish(sensor_topic, JSONmessageBuffer, true))
+		{
+			delay(20);
+		}
+		char JSONmessageBuffer1[150];
 			/*Serial.println("udalo sie wyslac poprzez MQTT");
 		else
 			Serial.println("I couldnt send over MQTT");*/
@@ -68,7 +74,7 @@ void setup() {
 		//}
 		//ESP.deepSleep(60E6-toCalculateTenMins, WAKE_RF_DEFAULT);
 		ESP.deepSleep(5e6, WAKE_RF_DEFAULT);
-	//SensorPylu();
+		
 
 
 
@@ -161,7 +167,6 @@ void SensorBME680(JsonObject& root)
 		pressureMeasure(root);
 		altitudeMeasure(root);
 		humidityMeasure(root);
-		Serial.println("Sprawdzenie w miedzyczasie");
 		gasMeasure(root);
 		
 		
