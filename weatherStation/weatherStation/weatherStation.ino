@@ -14,18 +14,22 @@
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
 #include <ArduinoJson.h>
-
+#include <ESP8266HTTPClient.h>
 
 #define PIN_LED          D6
 #define sensor_topic "esp8266/weatherS"
 #define dust_topic "esp8266/dust"
+const char* host = "127.0.0.1";
 Adafruit_BME680 bme;
 unsigned long endTime = 0;
 double toCalculateTenMins;
 WiFiClient espClient;
 PubSubClient client(espClient);
-void wifiSetup();
 
+
+
+void wifiSetup();
+void sendByHTTP();
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -44,7 +48,7 @@ void setup() {
 		client.loop();
 		root["Sensor"] = "ESP8266";
 		SensorBME680(root);
-		SensorPylu(root);
+		//SensorPylu(root);
 		Serial.println(root.measureLength() + 1);
 		//root.prettyPrintTo(Serial);
 		char JSONmessageBuffer[200];
@@ -61,6 +65,7 @@ void setup() {
 			Serial.println("I couldnt send over MQTT");*/
 		endTime = micros();
 		toCalculateTenMins = static_cast<double>(endTime);
+		sendByHTTP();
 		//Serial.println(toCalculateTenMins);
 		//Serial.println("INFO:Closing MQTT connection");
 		//client.disconnect();
@@ -184,4 +189,24 @@ void temperatureMeasure1(JsonObject& root)
 	root["temperature"] = msg;
 	Serial.println(msg);
 	client.publish(temperature_topic, msg, true);
+}
+
+
+void sendByHTTP()
+{
+	HTTPClient http;
+	String x, station, postdata;
+	x = "wartosc";
+	station = "a";
+	postdata = "status=" + x + "&station=" + station;
+	Serial.println(postdata);
+	http.begin("http://131.246.211.157/pohttp/postdemo.php");
+	http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+	int httpCode = http.POST(postdata);
+	String payload = http.getString();
+	Serial.println(httpCode);
+	Serial.println("Cos pomiedzy httpcode i payload");
+	Serial.println(payload);
+	http.end();
+
 }
