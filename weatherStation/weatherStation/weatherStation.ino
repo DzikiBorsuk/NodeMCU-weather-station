@@ -65,7 +65,7 @@ void setup() {
 			Serial.println("I couldnt send over MQTT");*/
 		endTime = micros();
 		toCalculateTenMins = static_cast<double>(endTime);
-		sendByHTTP();
+		//sendByHTTP();
 		//Serial.println(toCalculateTenMins);
 		//Serial.println("INFO:Closing MQTT connection");
 		//client.disconnect();
@@ -168,12 +168,21 @@ void SensorBME680(JsonObject& root)
 			return;
 		}
 		//temperatureMeasure1(root);
-		temperatureMeasure(root);
-		pressureMeasure(root);
-		altitudeMeasure(root);
-		humidityMeasure(root);
-		gasMeasure(root);
-		
+		HTTPClient http;
+		http.begin("http://131.246.174.115/sensory/postdemo.php");
+		http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+		String postdata;
+		temperatureMeasure(root,postdata);
+		pressureMeasure(root,postdata);
+		altitudeMeasure(root,postdata);
+		humidityMeasure(root,postdata);
+		gasMeasure(root,postdata);
+		Serial.println(postdata);
+		int httpCode = http.POST(postdata);
+		String payload = http.getString();
+		Serial.println(httpCode);
+		Serial.println(payload);
+		http.end();
 		
 		
 }
