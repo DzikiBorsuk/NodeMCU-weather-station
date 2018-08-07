@@ -16,93 +16,58 @@
 #include <ArduinoJson.h>
 #include <ESP8266HTTPClient.h>
 
-#define PIN_LED          D6
+//#define PIN_LED          D6
 #define sensor_topic "esp8266/weatherS"
-#define dust_topic "esp8266/dust"
+//#define dust_topic "esp8266/dust"
 const char* host = "127.0.0.1";
-Adafruit_BME680 bme;
+Adafruit_BME680 bme;	//sensorBME
 unsigned long endTime = 0;
 double toCalculateTenMins;
-WiFiClient espClient;
-PubSubClient client(espClient);
+WiFiClient espClient;			//wifirifi
+PubSubClient client(espClient); //do mqtt 
 
 
 
 void wifiSetup();
-void sendByHTTP();
-
 // the setup function runs once when you press reset or power the board
 void setup() {
 	
-	//beginTime = millis();
 	Serial.begin(115200);
 	//pinMode(PIN_LED, OUTPUT);
-	const char* mqtt_server = "cpsiot.cs.uni-kl.de";
-	wifiSetup();
-	client.setServer(mqtt_server, 1883);
-	StaticJsonBuffer<200> jsonBuffer;
-	JsonObject& root = jsonBuffer.createObject();
+	const char* mqtt_server = "cpsiot.cs.uni-kl.de"; //nazwa serwera MQTT
+	wifiSetup();	//inicjalizacja WiFi	
+	client.setServer(mqtt_server, 1883);	//ustawienie szczegolow serwera, port 1883 to nominalny port brokera
+	StaticJsonBuffer<200> jsonBuffer;		//ustawienie buforu json (rozmiar 200?)	
+	JsonObject& root = jsonBuffer.createObject(); //stworzenie obiektu json
 		if (!client.connected()) {
-			MQTTReconnect();
+			MQTTReconnect(); //patrzymy czy jestesmy polaczeni do mqtt, jesli nie to reconnect
 		}
-		client.loop();
-		root["Sensor"] = "ESP8266";
-		SensorBME680(root);
+		client.loop(); //client.loop() should be called regularly to allow the client to process incoming messages to send publish data and makes a refresh of the connection.
+		root["Sensor"] = "ESP8266"; //do Json, pod sensor bedzie esp8266
+		SensorBME680(root);			//wywolanie bme680(5 czujnikow), jako argument przekazujemy jsonobject, zeby zwrocic rowniez w json odpowiedz
 		//SensorPylu(root);
-		Serial.println(root.measureLength() + 1);
-		//root.prettyPrintTo(Serial);
-		char JSONmessageBuffer[200];
-		root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
-		Serial.println(JSONmessageBuffer);
+		Serial.println(root.measureLength() + 1); //zmierzenie wielkosci naszego roota, tylko do celow badawczych
+		char JSONmessageBuffer[200]; //tablica o rozmiarze 200 char
+		root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer)); //przepisanie z roota do tablicy jsonmessagebuffer
+		Serial.println(JSONmessageBuffer); //wypisanie w porcie szeregowym w JSON
 		
-		while (!client.publish(sensor_topic, JSONmessageBuffer, true))
+		while (!client.publish(sensor_topic, JSONmessageBuffer, true)) //patrzymy czy wyslal do mqtt pod topic sensor_topic (esp8266/weatherS), jak wyslal to wtedy petla sie konczy
 		{
 			delay(20);
 		}
-		char JSONmessageBuffer1[150];
-			/*Serial.println("udalo sie wyslac poprzez MQTT");
-		else
-			Serial.println("I couldnt send over MQTT");*/
-		endTime = micros();
-		toCalculateTenMins = static_cast<double>(endTime);
-		//sendByHTTP();
-		//Serial.println(toCalculateTenMins);
-		//Serial.println("INFO:Closing MQTT connection");
-		//client.disconnect();
-		//Serial.println("Info:Closing WIFI connection");
-		//WiFi.disconnect();
-		//int i = 0;
-		//while (client.connected()||(WiFi.status()==WL_CONNECTED))
-		//{
-		//	Serial.println(i++);
-		//	delay(10);
-		//}
-		//ESP.deepSleep(60E6-toCalculateTenMins, WAKE_RF_DEFAULT);
-		ESP.deepSleep(5e6, WAKE_RF_DEFAULT);
+		
+		endTime = micros(); //obliczamy czas od poczatku wlaczenia mikrokontrolera, unsigned long
+		toCalculateTenMins = static_cast<double>(endTime); //rzutujemy to na double, zeby w deepsleepa weszlo
+		ESP.deepSleep(6E8-toCalculateTenMins, WAKE_RF_DEFAULT); //deepsleep co 10min
+		
 		
 
 
 
 }
 
-
-
-// the loop function runs over and over again until power down or reset
 void loop()
-{
-	/*int x;
-	
-	digitalWrite(PIN_LED, HIGH);
-	delay(50);
-	x = analogRead(A0);
-	delay(1);
-	digitalWrite(PIN_LED, LOW);
-	Serial.println(x);
-	delay(500);*/
-	
-
-
-}
+{}
 
 void wifiSetup()
 {
@@ -110,11 +75,8 @@ void wifiSetup()
 	const char* password = "Wifi&49CPS";
 	Serial.println("Booting");
 	Serial.println("Connecting to WiFI");
-	WiFi.forceSleepWake();
+	WiFi.forceSleepWake(); //potrzbene do deep sleepa, funkcja bool
 	Serial.println("Przed podaniem hasla");
-
-	
-//>>>>>>> parent of 0f4c11f... usuniecie paru niepotrzebnych linijek, dodanie DeepSleepu(ale nie dziala jezscze perfekcyjnie)
 	WiFi.begin(ssid, password);
 	Serial.println("Po podaniu hasla");
 	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -158,18 +120,18 @@ void SensorBME680(JsonObject& root)
 		while (1);
 	}
 		//Set up oversampling and filter initialization
-		bme.setTemperatureOversampling(BME680_OS_8X);
+		bme.setTemperatureOversampling(BME680_OS_8X); //Setter for Temperature oversampling.
 		bme.setHumidityOversampling(BME680_OS_2X);
 		bme.setPressureOversampling(BME680_OS_4X);
-		bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
+		bme.setIIRFilterSize(BME680_FILTER_SIZE_3); //removes short-term fluctuations. nie jest potrzebny dla wilgotnosci i gazu
 		bme.setGasHeater(320, 150); // 320*C for 150 ms
-		if (!bme.performReading()) {
+		if (!bme.performReading()) {	//robimy odczyty z BME680
 			Serial.println("Failed to perform reading :(");
 			return;
 		}
 		//temperatureMeasure1(root);
 		HTTPClient http;
-		http.begin("http://131.246.174.115/sensory/postdemo.php");
+		http.begin("http://131.246.174.115/sensorDust/postdemo.php");
 		http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 		String postdata;
 		temperatureMeasure(root,postdata);
@@ -177,6 +139,7 @@ void SensorBME680(JsonObject& root)
 		altitudeMeasure(root,postdata);
 		humidityMeasure(root,postdata);
 		gasMeasure(root,postdata);
+		SensorPylu(root,postdata);
 		Serial.println(postdata);
 		int httpCode = http.POST(postdata);
 		String payload = http.getString();
@@ -185,37 +148,4 @@ void SensorBME680(JsonObject& root)
 		http.end();
 		
 		
-}
-void temperatureMeasure1(JsonObject& root)
-{
-	char msg[50];
-	float temp = bme.temperature;
-	Serial.print("Temperature = ");
-	Serial.print(String(temp).c_str());
-	Serial.println(" *C");
-	snprintf(msg, 75, String(temp).c_str());
-	
-	root["temperature"] = msg;
-	Serial.println(msg);
-	client.publish(temperature_topic, msg, true);
-}
-
-
-void sendByHTTP()
-{
-	HTTPClient http;
-	String x, station, postdata;
-	x = "wartosc";
-	station = "a";
-	postdata = "status=" + x + "&station=" + station;
-	Serial.println(postdata);
-	http.begin("http://131.246.211.157/pohttp/postdemo.php");
-	http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-	int httpCode = http.POST(postdata);
-	String payload = http.getString();
-	Serial.println(httpCode);
-	Serial.println("Cos pomiedzy httpcode i payload");
-	Serial.println(payload);
-	http.end();
-
 }

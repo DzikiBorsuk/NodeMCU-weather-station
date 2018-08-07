@@ -14,5 +14,5 @@
 #include<ArduinoJson.h>
 
 #define dust_topic "esp8266/dust"
-void SensorPylu(JsonObject& root);
+void SensorPylu(JsonObject& root, String& postdata);
 float computeDust();
