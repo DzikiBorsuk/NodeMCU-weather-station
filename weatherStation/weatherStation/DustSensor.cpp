@@ -42,7 +42,7 @@ float computeDust()
 	return 0;
 }
 
-void SensorPylu(JsonObject& root, String& postdata)
+void SensorPylu(JsonObject& root)//, String& postdata)
 {
 	char msg[50];
 	pinMode(PIN_LED, OUTPUT);
@@ -69,7 +69,7 @@ void SensorPylu(JsonObject& root, String& postdata)
 	Serial.println("ug/m3");
 	snprintf(msg, 75, String(AVG_DUST).c_str());
 	root["dust"] = msg;
-	postdata = postdata + "&dust=" + msg;
+	//postdata = postdata + "&dust=" + msg;
 	delay(500);
 }
 

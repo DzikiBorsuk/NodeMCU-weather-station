@@ -50,16 +50,17 @@ void setup() {
 		char JSONmessageBuffer[200]; //tablica o rozmiarze 200 char
 		root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer)); //przepisanie z roota do tablicy jsonmessagebuffer
 		Serial.println(JSONmessageBuffer); //wypisanie w porcie szeregowym w JSON
-		
 		while (!client.publish(sensor_topic, JSONmessageBuffer, true)) //patrzymy czy wyslal do mqtt pod topic sensor_topic (esp8266/weatherS), jak wyslal to wtedy petla sie konczy
 		{
 			delay(20);
+			Serial.println("petla do wyslania do esp8266 glownego zbioru");
 		}
-		
+		delay(200); //on musi tu byc jakis bo inaczej nie dziala!!!!!!!!!!
 		endTime = micros(); //obliczamy czas od poczatku wlaczenia mikrokontrolera, unsigned long
+		Serial.println("Jestem w tym momencie, powinien wrzucic juz caly esp8266/weatherS");
 		toCalculateTenMins = static_cast<double>(endTime); //rzutujemy to na double, zeby w deepsleepa weszlo
-		ESP.deepSleep(6E8-toCalculateTenMins, WAKE_RF_DEFAULT); //deepsleep co 10min
-		
+		//ESP.deepSleep(6E8-toCalculateTenMins, WAKE_RF_DEFAULT); //deepsleep co 10min
+		ESP.deepSleep(5E6, WAKE_RF_DEFAULT);
 		
 
 
@@ -131,15 +132,15 @@ void SensorBME680(JsonObject& root)
 		}
 		//temperatureMeasure1(root);
 		HTTPClient http;
-		http.begin("http://131.246.174.115/sensorDust/postdemo.php");
+		http.begin("http://131.246.211.172/sensory/postdemo.php");
 		http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 		String postdata;
 		temperatureMeasure(root,postdata);
 		pressureMeasure(root,postdata);
 		altitudeMeasure(root,postdata);
-		humidityMeasure(root,postdata);
-		gasMeasure(root,postdata);
-		SensorPylu(root,postdata);
+		humidityMeasure(root, postdata);
+		gasMeasure(root, postdata);
+		//SensorPylu(root);// , postdata);
 		Serial.println(postdata);
 		int httpCode = http.POST(postdata);
 		String payload = http.getString();

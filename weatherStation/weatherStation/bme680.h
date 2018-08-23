@@ -20,7 +20,7 @@
 
 void MQTTReconnect();
 void temperatureMeasure(JsonObject& root, String& postdata);
-void humidityMeasure(JsonObject& root,String& postdata);
+void humidityMeasure(JsonObject& root, String& postdata);
 void gasMeasure(JsonObject& root, String& postdata);
 void pressureMeasure(JsonObject& root, String& postdata);
 void altitudeMeasure(JsonObject& root, String& postdata);

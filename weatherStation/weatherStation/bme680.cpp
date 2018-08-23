@@ -21,7 +21,7 @@ void temperatureMeasure(JsonObject& root, String& postdata)
 	snprintf(msg, 75, String(temp).c_str());
 	root["temperature"] = msg;
 	postdata = postdata + "temperature=" + msg;
-	//client.publish(temperature_topic, msg, true);
+	client.publish(temperature_topic, msg, true);
 }
 void humidityMeasure(JsonObject& root, String& postdata)
 {
@@ -33,7 +33,7 @@ void humidityMeasure(JsonObject& root, String& postdata)
 	snprintf(msg, 75, String(temp).c_str());
 	root["humidity"] = msg;
 	postdata = postdata + "&humidity=" + msg;
-	//client.publish(humidity_topic, msg, true);
+	client.publish(humidity_topic, msg, true);
 }
 void gasMeasure(JsonObject& root, String& postdata)
 {
@@ -45,7 +45,7 @@ void gasMeasure(JsonObject& root, String& postdata)
 	snprintf(msg, 75, String(temp).c_str());
 	root["gas"] = msg;
 	postdata = postdata + "&gas=" + msg;
-	//client.publish(gas_topic, msg, true);
+	client.publish(gas_topic, msg, true);
 }
 void pressureMeasure(JsonObject& root, String& postdata)
 {
@@ -57,7 +57,7 @@ void pressureMeasure(JsonObject& root, String& postdata)
 	snprintf(msg, 75, String(temp).c_str());
 	root["pressure"] = msg;
 	postdata = postdata + "&pressure=" + msg;
-	//client.publish(pressure_topic, msg, true);
+	client.publish(pressure_topic, msg, true);
 }
 void altitudeMeasure(JsonObject& root, String& postdata)
 {
