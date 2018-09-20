@@ -46,7 +46,7 @@ void setup() {
 		root["Sensor"] = "ESP8266"; //do Json, pod sensor bedzie esp8266
 		SensorBME680(root);			//wywolanie bme680(5 czujnikow), jako argument przekazujemy jsonobject, zeby zwrocic rowniez w json odpowiedz
 		//SensorPylu(root);
-		Serial.println(root.measureLength() + 1); //zmierzenie wielkosci naszego roota, tylko do celow badawczych
+		//Serial.println(root.measureLength() + 1); //zmierzenie wielkosci naszego roota, tylko do celow badawczych
 		char JSONmessageBuffer[200]; //tablica o rozmiarze 200 char
 		root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer)); //przepisanie z roota do tablicy jsonmessagebuffer
 		Serial.println(JSONmessageBuffer); //wypisanie w porcie szeregowym w JSON
@@ -74,12 +74,12 @@ void wifiSetup()
 {
 	const char* ssid = "CPSWirelessNetwork";
 	const char* password = "Wifi&49CPS";
-	Serial.println("Booting");
-	Serial.println("Connecting to WiFI");
+	//Serial.println("Booting");
+	//Serial.println("Connecting to WiFI");
 	WiFi.forceSleepWake(); //potrzbene do deep sleepa, funkcja bool
-	Serial.println("Przed podaniem hasla");
+	//Serial.println("Przed podaniem hasla");
 	WiFi.begin(ssid, password);
-	Serial.println("Po podaniu hasla");
+	//Serial.println("Po podaniu hasla");
 	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
 		Serial.println("Connection Failed! Rebooting...");
 		delay(5000);
@@ -140,7 +140,7 @@ void SensorBME680(JsonObject& root)
 		altitudeMeasure(root,postdata);
 		humidityMeasure(root, postdata);
 		gasMeasure(root, postdata);
-		//SensorPylu(root);// , postdata);
+		SensorPylu(root);// , postdata);
 		Serial.println(postdata);
 		int httpCode = http.POST(postdata);
 		String payload = http.getString();

@@ -7,7 +7,8 @@
 #include <ArduinoJson.h>
 #define MIN_VOLTAGE     600 // mv - próg dolnego zakresu napiêcia dla braku py³u
 #define VREF           5000 // mv - napiêcie referencyjne komparatora
-#define PIN_LED          D6 // numer pinu ILED
+#define PIN_LED          D4 // numer pinu ILED
+#define PIN_ON			 D3	//uruchomienie sensora
 #define PIN_ANALOG       A0 // numer pinu AOUT
 #define MAX_ITERS        10 // liczba pomiarow do sredniej
 
@@ -46,6 +47,8 @@ void SensorPylu(JsonObject& root)//, String& postdata)
 {
 	char msg[50];
 	pinMode(PIN_LED, OUTPUT);
+	pinMode(PIN_ON, OUTPUT);
+	digitalWrite(PIN_ON, HIGH);
 	digitalWrite(PIN_LED, LOW);
 	AVG_DUST = 0;
 	ITER = 0;
@@ -61,7 +64,7 @@ void SensorPylu(JsonObject& root)//, String& postdata)
 			delay(50);
 		}
 	}
-
+	digitalWrite(PIN_ON, LOW);
 	AVG_DUST /= MAX_ITERS;
 
 	Serial.print("D = ");
@@ -70,6 +73,6 @@ void SensorPylu(JsonObject& root)//, String& postdata)
 	snprintf(msg, 75, String(AVG_DUST).c_str());
 	root["dust"] = msg;
 	//postdata = postdata + "&dust=" + msg;
-	delay(500);
+	client.publish(dust_topic, msg, true);
 }
 
