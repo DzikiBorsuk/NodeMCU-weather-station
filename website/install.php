@@ -3,7 +3,7 @@
 	//database creation
 	$servername="localhost";
 	$username="root";
-	$password="";
+	$password="qwerty";
 	
 	//create connection
 	$conn=new mysqli($servername,$username,$password);
@@ -13,7 +13,7 @@
 		die("Unable to connect" . $conn->connect_error); //zwraca jaki error wystapil! die rowniez zamyka skrypt
 	}
 	//create database
-	$sql="Create database sensorsd";
+	$sql="Create database weather_station";
 	if($conn->query($sql)===true) //jest rowny i tego samego typu! -operator scislego porownania
 	{
 		echo "Database created succesfully";
@@ -29,8 +29,8 @@
 	//connect to database and create table
 	$servername="localhost";
 	$username="root";
-	$password="";
-	$dbname="sensorsd";
+	$password="qwerty";
+	$dbname="weather_station";
 	
 	//create connection
 	$conn=new mysqli($servername,$username,$password,$dbname);

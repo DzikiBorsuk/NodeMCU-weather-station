@@ -1,8 +1,8 @@
 <?php
 	$servername="localhost";
 	$username="root";
-	$password="";
-	$dbname="sensorsd";
+	$password="qwerty";
+	$dbname="weather_station";
 	
 	$conn=new mysqli($servername,$username,$password,$dbname);
 	if($conn->connect_error)
@@ -12,6 +12,8 @@
 	date_default_timezone_set('Europe/Berlin');
 	$d=date("Y-m-d");
 	$t=date("H:i:s");
+
+    //$datetime = date_create()->format('Y-m-d H:i:s');
 
 	if(!empty($_POST['temperature']) && !empty($_POST['pressure'])&& !empty($_POST['altitude']) && !empty($_POST['humidity'])&& !empty($_POST['gas']))
     {
@@ -25,7 +27,7 @@
  
 	    $sql = "INSERT INTO logs (temperature, pressure, altitude, humidity, gas, dust, Date, Time)
 		
-		VALUES ('".$temperature."', '".$pressure."', '".$altitude."', '".$humidity."', '".$gas."', '".$dust."', '".$d."', '".$t."')";
+		VALUES ('".$temperature."', '".$pressure."', '".$altitude."', '".$humidity."', '".$gas."', '".$dust."', '".$d."','".$t."')";
  
 		if ($conn->query($sql) === TRUE) {
 		    echo "OK";

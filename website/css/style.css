@@ -1,7 +1,52 @@
+@font-face {
+    font-family: customGothic;
+    src: url("../font/GOTHIC.TTF");
+}
+
+body{
+    font-family: customGothic;
+}
+
 :root{
     --dark-dark: #1c2228;
 }
 
 .bg-dark-dark{
     background-color: var(--dark-dark);
+}
+
+.brand{
+    height: 60px;
+    width: 100%;
+}
+
+.brand > .brand-item{
+    width: 260px;
+}
+
+@media (max-width: 768px) {
+    .brand > .brand-item{
+        width: 1px;
+    }
+}
+
+.brand > .brand-item-title
+{
+    width: 260px;
+}
+
+.data-field{
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+}
+
+.graph{
+    position: absolute;
+    bottom: -28px;
+    left: -36px;
+    right: 0;
+    width: calc(100% + 44px);
+    height: 100px;
+    color: rgb(85, 124, 255);
 }
