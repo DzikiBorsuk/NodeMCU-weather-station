@@ -1,0 +1,143 @@
+@font-face {
+    font-family: customGothic;
+    src: url("../font/GOTHIC.TTF");
+}
+
+body {
+    font-family: customGothic;
+}
+
+:root {
+    --dark-dark: #1c2228;
+}
+
+.link {
+    text-decoration: none;
+    color: #f8f9fa;
+}
+
+.link:hover {
+    text-decoration: none;
+    color: #f8f9fa;
+}
+
+.bg-dark-dark {
+    background-color: var(--dark-dark);
+}
+
+.brand {
+    height: 60px;
+    width: 100%;
+}
+
+.brand > .brand-item {
+    width: 260px;
+}
+
+@media (max-width: 768px) {
+    .brand > .brand-item {
+        width: 1px;
+    }
+}
+
+.brand > .brand-item-title {
+    width: 260px;
+}
+
+.data-field {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.sensor-data {
+    height: 180px;
+}
+
+.temp-now {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(to right, orange, orangered);
+    border-radius: 50%;
+    font-size: 1.75rem;
+    font-weight: bold;
+}
+
+.humidex {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(to right, orangered, red);
+    border: solid gray;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.humidity-now {
+    width: 120px;
+    height: 120px;
+    font-size: 1.75rem;
+    font-weight: bold;
+}
+
+.dew-point {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(to right, blue, darkblue);
+    border: solid gray;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: bold;
+}
+
+.pressure-now {
+    width: 160px;
+    height: 120px;
+}
+
+.gauge {
+    width: 180px;
+}
+
+.graph {
+    position: absolute;
+    bottom: -32px;
+    left: -36px;
+    right: 0;
+    width: calc(100% + 44px);
+    height: 120px;
+    color: rgb(85, 124, 255);
+}
+
+.chart-big {
+    height: 500px;
+    width: 100%;
+}
+
+.btn-active {
+    background-color: #414fa4 !important;
+}
+
+.btn:focus, .btn:active {
+    outline: none !important;
+    box-shadow: none;
+}
+
+.dateTime {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.clock {
+    color: #17D4FE;
+    font-size: 45px;
+    font-family: Courier New;
+    /*letter-spacing: 7px;*/
+}
+
+#date{
+    font-size: 1.2rem;
+}

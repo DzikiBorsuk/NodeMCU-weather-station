@@ -3,18 +3,23 @@
 // 
 
 #include "DustSensor.h"
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
 #define MIN_VOLTAGE     600 // mv - próg dolnego zakresu napiêcia dla braku py³u
 #define VREF           5000 // mv - napiêcie referencyjne komparatora
-#define PIN_LED          D6 // numer pinu ILED
+#define PIN_LED          D4 // numer pinu ILED
+#define PIN_ON			 D3	//uruchomienie sensora
 #define PIN_ANALOG       A0 // numer pinu AOUT
 #define MAX_ITERS        10 // liczba pomiarow do sredniej
+
+extern PubSubClient client;
+extern JsonObject& root;
 
 int ADC_VALUE; // odczytana wartosc A0
 int ITER; // numer pomiaru
 float VOLTAGE; // wartosc napiecia
 float DUST; // wynik
 float AVG_DUST; // sredni wynik
-
 
 float computeDust()
 {
@@ -38,11 +43,12 @@ float computeDust()
 	return 0;
 }
 
-void SensorPylu()
+void SensorPylu(JsonObject& root)//, String& postdata)
 {
-	Serial.begin(9600);
-
+	char msg[50];
 	pinMode(PIN_LED, OUTPUT);
+	pinMode(PIN_ON, OUTPUT);
+	digitalWrite(PIN_ON, HIGH);
 	digitalWrite(PIN_LED, LOW);
 	AVG_DUST = 0;
 	ITER = 0;
@@ -58,13 +64,15 @@ void SensorPylu()
 			delay(50);
 		}
 	}
-
+	digitalWrite(PIN_ON, LOW);
 	AVG_DUST /= MAX_ITERS;
 
 	Serial.print("D = ");
 	Serial.print(AVG_DUST);
 	Serial.println("ug/m3");
-
-	delay(500);
+	snprintf(msg, 75, String(AVG_DUST).c_str());
+	root["dust"] = msg;
+	//postdata = postdata + "&dust=" + msg;
+	client.publish(dust_topic, msg, true);
 }
 

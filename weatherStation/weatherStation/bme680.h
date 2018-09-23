@@ -9,7 +9,7 @@
 	#include "WProgram.h"
 #endif
 
-
+#include <ArduinoJson.h>
 #endif
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define temperature_topic "esp8266/temperature"
@@ -19,8 +19,8 @@
 #define altitude_topic "esp8266/altitude"
 
 void MQTTReconnect();
-void temperatureMeasure();
-void humidityMeasure();
-void gasMeasure();
-void pressureMeasure();
-void altitudeMeasure();
+void temperatureMeasure(JsonObject& root, String& postdata);
+void humidityMeasure(JsonObject& root, String& postdata);
+void gasMeasure(JsonObject& root, String& postdata);
+void pressureMeasure(JsonObject& root, String& postdata);
+void altitudeMeasure(JsonObject& root, String& postdata);
