@@ -23,6 +23,8 @@
 		$humidity = $_POST['humidity'];
 		$gas = $_POST['gas'];
 		$dust = $_POST['dust'];
+
+
 		
  
 	    $sql = "INSERT INTO logs (temperature, pressure, altitude, humidity, gas, dust, Date, Time)

@@ -1,50 +1,61 @@
-let data = {
-    labels: [1,2,3,4,5,6,7],
-    datasets: [{
-        backgroundColor: "rgba(65, 79, 164,1)",
-        borderColor: "rgba(85, 124, 255,1)",
-        borderWidth: 2,
-        pointRadius: 0,
-        hoverBackgroundColor: "rgba(255,99,132,0.4)",
-        hoverBorderColor: "rgba(255,99,132,1)",
-        data: [65, 59, 20, 81, 56, 55, 40],
+$(function () {
 
-    }]
-};
+    $('.data-field').on('click', function () {
+        let link = $(this).attr('id');
+        link = link.replace('-href', '');
+        window.location.href = 'charts/' + link + '.php';
+    });
 
-let options = {
-    legend: {
-        display: false
-    },
-    maintainAspectRatio: false,
-    scales: {
-        yAxes: [{
-            gridLines: {
-                display: false,
-            }
-        }],
-        xAxes: [{
-            gridLines: {
-                display: false
-            }
-        }]
-    },
-    layout: {
-        padding: 0,
-    },
-    scaleLabel: {
-        display: true,
+    let interval = '12';
+
+    let temp_graph = null;
+    let humidity_graph = null;
+    let pressure_graph = null;
+    let gas_graph = null;
+    load_chart('temperature', 'temp-graph', interval, temp_graph);
+    load_chart('humidity', 'humidity-graph', interval, humidity_graph);
+    load_chart('pressure', 'pressure-graph', interval, pressure_graph);
+    load_chart('gas', 'gas-graph', interval, gas_graph);
+
+    function showTime() {
+        var date = new Date();
+        var h = date.getHours(); // 0 - 23
+        var m = date.getMinutes(); // 0 - 59
+        var s = date.getSeconds(); // 0 - 59
+        let ms = moment().milliseconds();
+        var session = "";
+
+        h = (h < 10) ? "0" + h : h;
+        m = (m < 10) ? "0" + m : m;
+        s = (s < 10) ? "0" + s : s;
+
+        if(ms<10)
+        {
+            ms="00"+ms;
+        }
+        else if(ms<100)
+        {
+            ms="0"+ms;
+        }
+
+        var time = h + ":" + m + ":" + s + ":" + ms +' ' + session;
+        document.getElementById("clockDisplay").innerText = time;
+        document.getElementById("clockDisplay").textContent = time;
+
+
+
+
+
     }
-};
 
-let ctx = $('#temp-graph');
+    function showDay(){
+        document.getElementById('date-day').innerText = moment().format('dddd');
+        document.getElementById('date').innerText = moment().format('DD MMMM YYYY');
+    }
 
-let myLineChart = new Chart(ctx, {
-    type: 'line',
-    options: options,
-    data: data
-});
+    showTime();
+    showDay();
+    setInterval(showTime, 13);
+    setInterval(showDay, 1000);
 
-$.get('http/last_12h_data.php',function (response) {
-    let data = JSON.parse(response);
 });
