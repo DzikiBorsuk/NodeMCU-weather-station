@@ -40,8 +40,8 @@ void setup() {
 		sendingByMqtt();
 		endTime = micros(); //obliczamy czas od poczatku wlaczenia mikrokontrolera, unsigned long
 		toCalculateTenMins = static_cast<double>(endTime); //rzutujemy to na double, zeby w deepsleepa weszlo
-		//ESP.deepSleep(6E8-toCalculateTenMins, WAKE_RF_DEFAULT); //deepsleep co 10min
-		ESP.deepSleep(30E6, WAKE_RF_DEFAULT);
+		ESP.deepSleep(6E8-toCalculateTenMins, WAKE_RF_DEFAULT); //deepsleep co 10min
+		//ESP.deepSleep(30E6, WAKE_RF_DEFAULT);
 		
 
 
@@ -110,7 +110,7 @@ void MQTTReconnect() {
 void HTTPtoWebsite(String postdata)
 {
 	HTTPClient http;
-	http.begin("http://131.246.211.159:81/weatherstation/postdemo.php");
+	http.begin("http://185.243.55.40/postdemo.php");
 	http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 	int httpCode = http.POST(postdata);
 	String payload = http.getString();
