@@ -194,7 +194,7 @@ if ($conn->connect_error) {
         <div class="col-lg-4 my-3">
             <div id="gas-href" class="bg-dark rounded data-field">
                 <div style="width: 100%">
-                    <p style="margin: 0" align="center">Gas</p>
+                    <p style="margin: 0" align="center">Gas (VOC)</p>
                 </div>
                 <div class="row sensor-data">
                     <div class="col-3 h-100 d-flex justify-content-center align-items-center">
