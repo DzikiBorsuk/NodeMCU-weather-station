@@ -6,7 +6,6 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
-Adafruit_BME680 bme1; // I2C
 extern Adafruit_BME680 bme;
 extern PubSubClient client;
 extern JsonObject& root;
