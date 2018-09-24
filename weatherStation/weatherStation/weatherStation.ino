@@ -20,7 +20,7 @@
 const char* host = "127.0.0.1"; //??
 Adafruit_BME680 bme;	//sensorBME
 WiFiClient espClient;			//wifirifi
-PubSubClient client(espClient); //do mqtt 
+PubSubClient client(espClient);
 
 
 
@@ -30,19 +30,19 @@ void setup() {
 	unsigned long endTime = 0;
 	double toCalculateTenMins;
 	Serial.begin(115200);
-	wifiSetup();	//inicjalizacja WiFi	
+	wifiSetup();	// WiFi initialization
 	setMqttConnection(); //starting mqtt
-	
+
 		if (!client.connected()) {
-			MQTTReconnect(); //patrzymy czy jestesmy polaczeni do mqtt, jesli nie to reconnect
+			MQTTReconnect(); //We are looking if we are connected to the mqtt, if not:reconnect
 		}
 		client.loop(); //client.loop() should be called regularly to allow the client to process incoming messages to send publish data and makes a refresh of the connection.
 		sendingByMqtt();
-		endTime = micros(); //obliczamy czas od poczatku wlaczenia mikrokontrolera, unsigned long
-		toCalculateTenMins = static_cast<double>(endTime); //rzutujemy to na double, zeby w deepsleepa weszlo
-		ESP.deepSleep(6E8-toCalculateTenMins, WAKE_RF_DEFAULT); //deepsleep co 10min
+		endTime = micros(); //We are checking the time since the start of the program , unsigned long
+		toCalculateTenMins = static_cast<double>(endTime); //we are casting  to  double to make it enter deepsleep
+		ESP.deepSleep(6E8-toCalculateTenMins, WAKE_RF_DEFAULT); //deepsleep for every 10min
 		//ESP.deepSleep(30E6, WAKE_RF_DEFAULT);
-		
+
 
 
 
@@ -52,20 +52,19 @@ void loop()
 {}
 void sendingByMqtt()
 {
-	StaticJsonBuffer<200> jsonBuffer;		//ustawienie buforu json (rozmiar 200?)	
-	JsonObject& root = jsonBuffer.createObject(); //stworzenie obiektu json
-	//root["Sensor"] = "ESP8266"; //do Json, pod sensor bedzie esp8266
-	SensorBME680(root);			//wywolanie bme680(5 czujnikow), jako argument przekazujemy jsonobject, zeby zwrocic rowniez w json odpowiedz
-	char JSONmessageBuffer[200]; //tablica o rozmiarze 200 char
-	root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer)); //przepisanie z roota do tablicy jsonmessagebuffer
-	Serial.println(JSONmessageBuffer); //wypisanie w porcie szeregowym w JSON
-	client.publish(sensor_topic, JSONmessageBuffer, true); //patrzymy czy wyslal do mqtt pod topic sensor_topic (esp8266/weatherS), jak wyslal to wtedy petla sie konczy
-	delay(300); //musi!
+	StaticJsonBuffer<200> jsonBuffer;		//setting json buffer (rozmiar 200?)
+	JsonObject& root = jsonBuffer.createObject(); //creating  json object
+	//root["Sensor"] = "ESP8266";
+	SensorBME680(root);			// bme680(4 sensors) call, we are passing  jsonobject as an argument because we want the response also in json
+	char JSONmessageBuffer[200];
+	root.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer)); //rewriting from root to jsonmessagebuffer
+	Serial.println(JSONmessageBuffer);
+	client.publish(sensor_topic, JSONmessageBuffer, true); //we are looking if it was send to mqtt to sensor_topic (esp8266/weatherS), if it was send then the loop ends
 }
 void setMqttConnection()
 {
-	const char* mqtt_server = "cpsiot.cs.uni-kl.de"; //nazwa serwera MQTT
-	client.setServer(mqtt_server, 1883);	//ustawienie szczegolow serwera, port 1883 to nominalny port brokera
+	const char* mqtt_server = "cpsiot.cs.uni-kl.de"; //name of MQTT server
+	client.setServer(mqtt_server, 1883);	//setting of  server properties, port 1883 is default port of brokera
 }
 void wifiSetup()
 {
@@ -73,7 +72,7 @@ void wifiSetup()
 	const char* password = "Wifi&49CPS";
 	Serial.println("Booting");
 	Serial.println("Connecting to WiFI");
-	WiFi.forceSleepWake(); //potrzbene do deep sleepa, funkcja bool
+	WiFi.forceSleepWake(); //required for deep sleepa
 	Serial.println("Przed podaniem hasla");
 	WiFi.begin(ssid, password);
 	Serial.println("Po podaniu hasla");
@@ -84,7 +83,7 @@ void wifiSetup()
 	}
 
 
-	
+
 }
 
 void MQTTReconnect() {
@@ -123,7 +122,7 @@ void SensorBME680(JsonObject& root)
 {
 	while (!Serial);
 	Serial.println(F("BME680 test"));
-	
+
 	if (!bme.begin()) {
 		Serial.println("Could not find a valid BME680 sensor, check wiring!");
 		while (1);
@@ -132,13 +131,13 @@ void SensorBME680(JsonObject& root)
 		bme.setTemperatureOversampling(BME680_OS_8X); //Setter for Temperature oversampling.
 		bme.setHumidityOversampling(BME680_OS_2X);
 		bme.setPressureOversampling(BME680_OS_4X);
-		bme.setIIRFilterSize(BME680_FILTER_SIZE_3); //removes short-term fluctuations. nie jest potrzebny dla wilgotnosci i gazu
+		bme.setIIRFilterSize(BME680_FILTER_SIZE_3); //removes short-term fluctuations
 		bme.setGasHeater(320, 150); // 320*C for 150 ms
 		if (!bme.performReading()) {	//robimy odczyty z BME680
 			Serial.println("Failed to perform reading :(");
 			return;
 		}
-		
+
 		String postdata;
 		temperatureMeasure(root,postdata);
 		delay(50);
@@ -150,10 +149,9 @@ void SensorBME680(JsonObject& root)
 		delay(50);
 		gasMeasure(root,postdata);
 		delay(50);
-		//SensorPylu(root, postdata);
-		//delay(50);
+
 		HTTPtoWebsite(postdata);
-		
-		
-		
+
+
+
 }
