@@ -103,9 +103,9 @@ body {
 .graph {
     position: absolute;
     bottom: -32px;
-    left: -36px;
+    left: -59px;
     right: 0;
-    width: calc(100% + 44px);
+    width: calc(100% + 63px);
     height: 120px;
     color: rgb(85, 124, 255);
 }
